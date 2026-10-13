@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>成绩与绩点计算器</title>
+  <style>
+    :root{font-family:"Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;color:#253044;background:#f6f4f6}
+    *{box-sizing:border-box}body{margin:0;min-width:680px}button,input,select{font:inherit}
+    button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}
+    .top{background:#fff;border-bottom:1px solid #e8e3e8;padding:18px 28px 16px;box-shadow:0 2px 16px #32223408}
+    .brand{display:flex;align-items:center;gap:13px}.brand-mark{width:38px;height:38px;border-radius:12px;background:#ae354b;color:white;display:grid;place-items:center;font-size:22px;font-weight:bold;box-shadow:0 6px 14px #ae354b25}
+    h1{font-size:22px;margin:0;font-weight:700}.subtitle{font-size:12px;color:#87909e;margin:3px 0 0}
+    .toolbar{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-top:19px}
+    .field{display:flex;flex-direction:column;gap:6px;font-size:12px;color:#6a7280}.field select,.search{height:37px;border:1px solid #dcdce3;border-radius:8px;background:#fff;color:#263346;padding:0 12px;outline:none}
+    .field select{min-width:180px}.field select:focus,.search:focus{border-color:#bd4659;box-shadow:0 0 0 3px #bd46591c}
+    .button{border:1px solid #dcdce3;border-radius:8px;background:#fff;color:#354153;padding:9px 15px;min-height:37px;font-weight:600}
+    .button:hover{background:#faf5f6;border-color:#c7969f}.button.primary{background:#b4374c;color:#fff;border-color:#b4374c}.button.primary:hover{background:#9c2b3f}
+    .button.quiet{border-color:transparent;color:#747985}.button.quiet:hover{color:#b4374c;background:#fff2f4}
+    .help-button{width:31px;height:31px;margin-bottom:3px;border:2px solid #8b929e;border-radius:50%;background:#fff;color:#687282;font-size:19px;font-weight:700;line-height:1;display:grid;place-items:center;padding:0;flex:none}.help-button:hover{border-color:#b4374c;color:#b4374c;background:#fff5f6}.help-button:focus-visible{outline:3px solid #b4374c66;outline-offset:2px}
+    .spacer{flex:1}.search{width:220px}.filename{font-size:12px;color:#737d8a;margin-top:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .import-notes{font-size:12px;color:#86717b;line-height:1.65;margin-top:8px}.import-notes:empty{display:none}
+    .filter-button{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.filter-button svg{width:15px;height:15px}.filter-button.active{color:#ad3148;border-color:#d99caa;background:#fff5f6}
+    .filter-count{border-radius:10px;background:#b4374c;color:white;font-size:10px;min-width:17px;padding:1px 5px;text-align:center}
+    .advanced-panel{padding:20px;background:#fbf8fa;border-bottom:1px solid #e9e3e8}.advanced-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.advanced-heading h3{font-size:15px;margin:0}.advanced-heading p{font-size:12px;color:#87909e;margin:5px 0 0}
+    .filter-group{margin:0 0 15px;border:0;padding:0;min-width:0}.filter-group legend{font-size:12px;font-weight:600;color:#5e6777;margin-bottom:8px}.filter-options{display:flex;flex-wrap:wrap;gap:7px;max-height:120px;overflow:auto;padding:2px}.filter-chip{position:relative;cursor:pointer}.filter-chip input{position:absolute;opacity:0;width:1px;height:1px}.filter-chip span{display:block;background:white;border:1px solid #dddce4;border-radius:7px;font-size:12px;color:#647084;padding:7px 11px}.filter-chip input:checked+span{color:#a02d44;border-color:#c97c8c;background:#fff0f3}.filter-chip input:focus-visible+span{outline:2px solid #b4374c;outline-offset:2px}
+    .filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.range-field{display:flex;align-items:center;gap:7px}.range-field input{width:100%;min-width:0;height:34px;border:1px solid #dddce4;border-radius:7px;padding:0 9px;background:white;color:#354153}.range-field span{color:#9aa1ad}.filter-field{display:flex;flex-direction:column;gap:7px;font-size:12px;color:#5e6777;margin-bottom:12px}.filter-field select{height:34px;border:1px solid #dddce4;border-radius:7px;padding:0 9px;background:white;color:#354153}
+    .filter-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}.filter-preview{font-size:12px;color:#7b8492;margin-right:auto}.filter-error{color:#b53249;font-size:12px;margin:0 0 10px}.filter-summary{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid #eee5e9;background:#fff9fa;color:#a4475b;font-size:12px}.filter-summary span{flex:1}.filter-summary button{border:0;background:none;color:#a4475b;text-decoration:underline;cursor:pointer}
+    main{max-width:1540px;margin:auto;padding:24px 28px 40px}
+    .summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .card{background:#fff;border:1px solid #eae6e9;border-radius:12px;padding:17px 21px;box-shadow:0 2px 12px #30243806}
+    .card .label{font-size:13px;color:#818997}.card .value{font-size:27px;font-weight:700;margin-top:8px;font-variant-numeric:tabular-nums}.card.highlight{background:#fff5f6;border-color:#f0d4da}.card.highlight .value{color:#ad3148}
+    .method{margin:16px 0 19px;color:#657080;font-size:13px;line-height:1.75}.policy-hint{color:#7b7480}.policy-modal{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 40px);overflow:auto}.policy-heading{display:flex;align-items:center;gap:12px;margin-bottom:15px}.policy-heading h2{margin:0}.policy-modal .policy-lead{font-size:15px;color:#4d5868;line-height:1.8}.policy-steps{margin:0 0 16px;padding:14px 18px 14px 38px;border-radius:9px;background:#faf3f5;color:#556071;font-size:14px;line-height:1.9}.policy-modal .policy-small{font-size:12px;color:#9095a1;margin:0}.policy-backdrop{z-index:40}.method strong{color:#303b4b}.method .excluded-nature{color:#b53249}.method .dirty{color:#aa3449;font-weight:600}
+    .panel{background:white;border:1px solid #e8e3e8;border-radius:12px;box-shadow:0 2px 12px #30243806;overflow:hidden}
+    .panel-tools{display:flex;align-items:center;gap:9px;padding:13px 18px;border-bottom:1px solid #ece8eb;flex-wrap:wrap}
+    .panel-title{font-size:16px;font-weight:700;margin-right:9px}.minor{font-size:12px;color:#88909c}.panel-tools .button{font-size:12px;padding:6px 11px;min-height:31px}
+    .term-filter{display:flex;align-items:center;gap:7px;color:#667181;font-size:12px;white-space:nowrap}.term-filter select{min-width:160px;max-width:230px;height:32px;border:1px solid #dcdce3;border-radius:7px;background:#fff;color:#354153;padding:0 9px}
+    .table-wrap{max-height:calc(100vh - 382px);min-height:260px;overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+    thead th{position:sticky;top:0;background:#f7f5f7;color:#747d8b;text-align:left;font-size:12px;font-weight:600;padding:13px 14px;border-bottom:1px solid #e9e4e8;z-index:1}
+    .sort-button{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;color:inherit;font-size:inherit;font-weight:inherit;white-space:nowrap}.sort-button:hover{color:#303b4b}.sort-button:focus-visible{outline:2px solid #b4374c;outline-offset:3px;border-radius:3px}
+    .sort-arrows{display:flex;flex-direction:column;gap:2px}.sort-up,.sort-down{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent}.sort-up{border-bottom:5px solid #bdc2ca}.sort-down{border-top:5px solid #bdc2ca}.sort-button[data-order="asc"] .sort-up{border-bottom-color:#303b4b}.sort-button[data-order="desc"] .sort-down{border-top-color:#303b4b}
+    tbody td{border-bottom:1px solid #f0edf0;padding:12px 14px;font-size:14px;height:58px;vertical-align:middle}
+    tbody tr:hover{background:#fff9fa}tbody tr.off{color:#9299a4;background:#fcfafb}tbody tr.off:hover{background:#faf5f6}
+    th:first-child,td:first-child{width:118px}th:nth-child(2){width:31%}th:nth-child(3){width:13%}th:nth-child(4),th:nth-child(5),th:nth-child(6){width:11%}
+    .course-name{font-weight:600;color:#2d3949}.off .course-name{color:#9299a4}.term{font-size:11px;color:#9aa1ad;margin-top:3px}.num{font-variant-numeric:tabular-nums}.grade-note{font-size:11px;color:#a14658;margin-left:5px}.bad,.grade-fail{color:#b53249;font-weight:700}
+    .switch{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#959aa4;font-size:12px;font-weight:600;padding:0;white-space:nowrap}
+    .track{position:relative;width:43px;height:23px;border-radius:14px;background:#d4d8dc;transition:background .15s;flex:none}.knob{position:absolute;top:3px;left:3px;width:17px;height:17px;background:#fff;border-radius:50%;box-shadow:0 1px 3px #0003;transition:left .15s}
+    .switch[aria-checked="true"]{color:#ad354b}.switch[aria-checked="true"] .track{background:#b8384d}.switch[aria-checked="true"] .knob{left:23px}
+    tbody tr.fail-row td,tbody tr.fail-row .course-name,tbody tr.fail-row .switch,tbody tr.fail-row .grade-note{color:#b53249}
+    .empty{text-align:center;padding:58px 16px;color:#8b929e}.empty strong{display:block;color:#4e5968;margin-bottom:7px;font-size:16px}
+    .foot{font-size:12px;color:#9299a4;margin-top:14px;line-height:1.6}
+    .toast-stack{position:fixed;right:24px;bottom:24px;width:min(420px,calc(100vw - 48px));display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:60;pointer-events:none}.toast{position:relative;background:#28384b;color:#fff;padding:11px 16px;border-radius:9px;box-shadow:0 8px 24px #0002;max-width:100%;overflow-wrap:anywhere;opacity:1;transition:opacity .35s ease}.toast.error{background:#ab3147}.toast.leaving{opacity:0}@media(prefers-reduced-motion:reduce){.toast{transition:none}}
+    .modal-backdrop{position:fixed;inset:0;background:#1e263c76;display:grid;place-items:center;z-index:20}.modal{background:#fff;border-radius:14px;width:min(420px,calc(100vw - 32px));padding:24px;box-shadow:0 18px 50px #0003}.modal h2{font-size:19px;margin:0 0 10px}.modal p{font-size:13px;color:#737b88;line-height:1.5;margin:0 0 17px}.modal input{width:100%;height:42px;border:1px solid #d9dce2;border-radius:8px;padding:0 11px;outline:none}.modal input:focus{border-color:#b8384d}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+    .help-backdrop{position:fixed;inset:0;background:#1e263ca6;display:grid;place-items:center;z-index:30;padding:20px}.help-dialog{background:#fff;border-radius:14px;width:min(1080px,100%);max-height:100%;display:flex;flex-direction:column;box-shadow:0 22px 60px #0004;overflow:hidden}.help-header{display:flex;align-items:center;gap:16px;padding:18px 22px;border-bottom:1px solid #e9e5e9}.help-header h2{font-size:20px;margin:0}.help-close{margin-left:auto;border:0;background:transparent;color:#667181;font-size:28px;line-height:1;width:32px;height:32px;border-radius:7px}.help-close:hover{background:#f6edef;color:#ac344a}.help-content{display:grid;grid-template-columns:minmax(280px,46%) minmax(300px,1fr);gap:26px;padding:22px;overflow:auto}.help-figure{margin:0}.help-figure img{display:block;width:100%;height:auto;border:1px solid #dae1e8;border-radius:8px;background:#c6e9f9}.help-figure figcaption{font-size:12px;color:#8b929e;margin-top:8px}.help-copy h3{font-size:16px;margin:3px 0 11px}.help-copy p,.help-copy li{font-size:14px;line-height:1.75;color:#4d5868}.help-copy ul{padding-left:21px;margin:8px 0 18px}.help-copy .notice{background:#f7f4f6;border-left:3px solid #b4374c;border-radius:5px;padding:12px 14px}.help-copy a{color:#a52e45;font-weight:600;text-decoration:underline;text-underline-offset:2px}.help-copy .small{font-size:12px;color:#9299a4}
+    .drop-overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:28px;background:#f5e8edaa;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);pointer-events:none}
+    .drop-card{width:min(560px,100%);min-height:280px;border:3px dashed #b63d55;border-radius:24px;background:#ffffffd9;box-shadow:0 24px 70px #70334938;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;color:#9f3047}
+    .drop-icon{width:76px;height:76px;border-radius:24px;background:#f9e5ea;display:grid;place-items:center;font-size:38px;line-height:1;margin-bottom:19px}.drop-title{font-size:27px;font-weight:750;color:#7f2538}.drop-hint{font-size:14px;color:#76636a;margin:10px 0 0}
+    [hidden]{display:none!important}
+    @media(max-width:900px){main{padding:18px}.top{padding:16px 18px}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.table-wrap{max-height:calc(100vh - 450px)}.search{width:170px}.help-content{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><div class="brand-mark">成</div><div><h1>成绩与绩点计算器</h1><p class="subtitle">选择课程，即时查看加权结果</p></div></div>
+    <div class="toolbar">
+      <button class="button primary" id="importButton">导入成绩单</button>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+      <label class="field">计算模板<select id="templateSelect"></select></label>
+      <button class="button" id="saveButton">另存为自定义模板</button>
+      <button class="button" id="deleteButton" disabled>删除模板</button>
+      <div class="spacer"></div>
+      <input class="search" id="searchInput" type="search" placeholder="搜索课程名或性质" aria-label="搜索课程">
+      <button class="help-button" id="helpButton" type="button" aria-label="打开帮助" title="帮助"><span aria-hidden="true">?</span></button>
+      <button class="button quiet" id="exitButton">退出程序</button>
+    </div>
+    <div class="filename" id="fileLabel">尚未导入成绩单。支持 Excel 和 CSV；可将文件拖入窗口或拖到 exe 上打开。</div>
+    <div class="import-notes" id="importNotes" aria-live="polite"></div>
+  </header>
+  <main>
+    <section class="summary" aria-label="加权结果">
+      <div class="card highlight"><div class="label">加权成绩</div><div class="value" id="weightedScore">0.00000</div></div>
+      <div class="card highlight"><div class="label">加权绩点</div><div class="value" id="weightedGpa">0.0000</div></div>
+      <div class="card"><div class="label">计入学分</div><div class="value" id="totalCredits">0.0</div></div>
+      <div class="card"><div class="label">计入课程</div><div class="value" id="selectedCount">0 / 0</div></div>
+    </section>
+    <div class="method" id="methodLabel"></div>
+    <section class="panel">
+      <div class="panel-tools">
+        <div class="panel-title">课程明细</div><div class="minor" id="visibleCount"></div>
+        <div class="spacer"></div>
+        <label class="term-filter">学年学期<select id="termFilter" aria-label="按学年学期筛选"><option value="">全部学期</option></select></label>
+        <button class="button" id="selectVisible">全部计入筛选</button>
+        <button class="button" id="excludeVisible">全部排除筛选</button>
+        <button class="button" id="selectRequired">计入所有必修课</button>
+        <button class="button filter-button" id="advancedFilter" type="button" aria-expanded="false" aria-controls="advancedPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h18l-7 8v7l-4 2V12z"/></svg>高级筛选<span class="filter-count" id="filterCount" hidden></span></button>
+      </div>
+      <section class="advanced-panel" id="advancedPanel" hidden aria-labelledby="advancedTitle">
+        <div class="advanced-heading"><div><h3 id="advancedTitle">高级筛选</h3><p>学期与课程性质来自当前成绩单。每组可多选，不选择即为全部；不同条件同时满足才显示。</p></div><button class="help-close" id="closeAdvanced" type="button" aria-label="收起高级筛选">×</button></div>
+        <fieldset class="filter-group"><legend>学年学期</legend><div class="filter-options" id="advancedTerms"></div></fieldset>
+        <fieldset class="filter-group"><legend>课程性质</legend><div class="filter-options" id="advancedNatures"></div></fieldset>
+        <div class="filter-grid">
+          <fieldset class="filter-group"><legend>成绩范围</legend><div class="range-field"><input id="scoreMin" type="number" step="any" placeholder="最低分" aria-label="最低成绩"><span>至</span><input id="scoreMax" type="number" step="any" placeholder="最高分" aria-label="最高成绩"></div></fieldset>
+          <fieldset class="filter-group"><legend>绩点范围</legend><div class="range-field"><input id="gpaMin" type="number" step="any" placeholder="最低值" aria-label="最低绩点"><span>至</span><input id="gpaMax" type="number" step="any" placeholder="最高值" aria-label="最高绩点"></div></fieldset>
+          <fieldset class="filter-group"><legend>学分范围</legend><div class="range-field"><input id="creditMin" type="number" step="any" placeholder="最低值" aria-label="最低学分"><span>至</span><input id="creditMax" type="number" step="any" placeholder="最高值" aria-label="最高学分"></div></fieldset>
+          <label class="filter-field">计入状态<select id="includedFilter"><option value="">全部课程</option><option value="included">已计入</option><option value="excluded">已排除</option></select></label>
+          <label class="filter-field">成绩状态（百分制）<select id="resultFilter"><option value="">全部成绩</option><option value="pass">及格（≥60）</option><option value="fail">不及格（＜60）</option><option value="invalid">成绩待核对</option></select></label>
+        </div>
+        <p class="filter-error" id="filterError" hidden></p>
+        <div class="filter-actions"><span class="filter-preview" id="filterPreview" aria-live="polite"></span><button class="button" id="resetAdvanced" type="button">重置条件</button><button class="button primary" id="applyAdvanced" type="button">应用筛选</button></div>
+      </section>
+      <div class="filter-summary" id="filterSummary" hidden><span id="filterSummaryText"></span><button id="clearFilters" type="button">清除筛选</button></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>计入</th><th>课程名</th>
+            <th aria-sort="none"><button class="sort-button" type="button" data-sort="nature">课程性质<span class="sort-arrows" aria-hidden="true"><span class="sort-up"></span><span class="sort-down"></span></span></button></th>
+            <th aria-sort="none"><button class="sort-button" type="button" data-sort="score">总成绩<span class="sort-arrows" aria-hidden="true"><span class="sort-up"></span><span class="sort-down"></span></span></button></th>
+            <th aria-sort="none"><button class="sort-button" type="button" data-sort="gpa">绩点<span class="sort-arrows" aria-hidden="true"><span class="sort-up"></span><span class="sort-down"></span></span></button></th>
+            <th aria-sort="none"><button class="sort-button" type="button" data-sort="credit">学分<span class="sort-arrows" aria-hidden="true"><span class="sort-up"></span><span class="sort-down"></span></span></button></th>
+            <th aria-sort="none"><button class="sort-button" type="button" data-sort="term">学年学期<span class="sort-arrows" aria-hidden="true"><span class="sort-up"></span><span class="sort-down"></span></span></button></th>
+          </tr></thead>
+          <tbody id="courseBody"></tbody>
+        </table>
+        <div class="empty" id="emptyState" hidden><strong>暂无课程</strong><span>导入成绩单，或清除搜索和筛选条件。</span></div>
+      </div>
+    </section>
+    <div class="foot">等级成绩按“优秀（95）、良好（85）、中等（75）、及格（65）、不及格（55）”换算。自定义模板保存的是内置规则加上手动调整；导入新成绩单时，新课程会按其基础规则选择。</div>
+  </main>
+  <div id="toast" class="toast-stack" aria-live="polite" aria-relevant="additions"></div>
+  <div class="drop-overlay" id="dropOverlay" hidden aria-hidden="true">
+    <div class="drop-card"><div class="drop-icon" aria-hidden="true">↓</div><div class="drop-title" id="dropTitle">拖入此处导入成绩单</div><p class="drop-hint">松开鼠标即可导入 · 支持 .xlsx、.xls、.csv</p></div>
+  </div>
+  <div class="modal-backdrop policy-backdrop" id="policyModal" hidden>
+    <section class="modal policy-modal" role="dialog" aria-modal="true" aria-labelledby="policyTitle" aria-describedby="policyDescription">
+      <div class="policy-heading"><h2 id="policyTitle">请按本学院政策设置计算模板</h2><button class="help-close" id="closePolicy" type="button" aria-label="确认并关闭学院政策提醒">×</button></div>
+      <p class="policy-lead" id="policyDescription">不同学院的保研政策和计入课程范围可能不同。内置保研模板仅供参考，请以本学院当年发布的政策为准。</p>
+      <ol class="policy-steps"><li>导入成绩单，核对本学院的课程计入要求。</li><li>通过课程左侧开关，调整需要计入或排除的课程。</li><li>点击顶部“另存为自定义模板”，保存适合本学院的计算方案。</li><li>下次使用时，在“计算模板”中选择已保存的模板。</li></ol>
+      <p class="policy-small">确认后不再自动弹出。可通过右上角“？”帮助按钮再次查看这段指引。</p>
+      <div class="modal-actions"><button class="button primary" id="acknowledgePolicy" type="button">我已了解</button></div>
+    </section>
+  </div>
+  <div class="modal-backdrop" id="saveModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">保存自定义模板</h2>
+      <p id="modalDescription"></p>
+      <input id="templateName" maxlength="40" placeholder="例如：奖学金（剔除指定必修课）" aria-label="模板名称">
+      <div class="modal-actions"><button class="button" id="cancelSave">取消</button><button class="button primary" id="confirmSave">保存模板</button></div>
+    </div>
+  </div>
+  <div class="help-backdrop" id="helpModal" hidden>
+    <section class="help-dialog" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <div class="help-header"><h2 id="helpTitle">帮助与成绩单说明（适用于吉林大学）</h2><button class="help-close" id="closeHelp" type="button" aria-label="关闭帮助">×</button></div>
+      <div class="help-content">
+        <figure class="help-figure">
+          <a href="/assets/jlu_transcript_explanation.jpg" target="_blank" rel="noopener noreferrer" title="查看原图"><img src="/assets/jlu_transcript_explanation.jpg" alt="吉林大学本科学生成绩单相关说明：学时、学分、成绩等级、绩点和平均学分绩点公式"></a>
+          <figcaption>吉林大学《本科学生成绩单相关说明》。点击图片可查看原图。</figcaption>
+        </figure>
+        <div class="help-copy">
+          <h3>按本学院政策保存计算模板</h3>
+          <p>不同学院保研政策不同，内置保研模板仅供参考。请以本学院当年政策为准，导入成绩单后调整课程左侧的计入/排除开关，再点击“另存为自定义模板”保存；下次在“计算模板”中选择该模板。</p>
+          <h3>如何理解这张说明</h3>
+          <ul>
+            <li>图中说明了学时与学分的关系，以及百分制成绩、等级成绩和绩点的对应区间。</li>
+            <li>平均学分绩点的计算方式为：Σ（课程学分 × 课程绩点）÷ Σ课程学分。</li>
+            <li>本软件按左侧开关选择的课程进行学分加权；加权绩点读取成绩单中的“绩点”列。等级成绩换算为优秀 95 分、良好 85 分、中等 75 分、及格 65 分、不及格 55 分。</li>
+          </ul>
+          <div class="notice">
+            <h3>培养方案查询</h3>
+            <p>2022/2026 版培养方案请到对应学院官网，或通过<a href="https://cas.jlu.edu.cn/" target="_blank" rel="noopener noreferrer">吉林大学智慧校园入口</a>登录后进入教务系统查询。</p>
+          </div>
+          <p class="small">本图用于解读成绩单；具体课程要求与培养方案以学院或教务系统发布的版本为准。</p>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+    const $ = id => document.getElementById(id);
+    const clientId = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+    const gradeValues = {优秀:95,良好:85,中等:75,及格:65,不及格:55};
+    const collator = new Intl.Collator('zh-CN',{numeric:true,sensitivity:'base'});
+    let sortKey = null, sortDirection = null;
+    let app = {courses:[], builtins:[], templates:[], token:'', filename:'', selected:[], active:'postgraduate', base:'postgraduate', dirty:false};
+    const TOAST_LIFETIME=4000, TOAST_FADE=350;
+    const toastTimers=new Map(), toastMotion=new WeakMap();
+    const emptyFilters=()=>({terms:[],natures:[],scoreMin:'',scoreMax:'',gpaMin:'',gpaMax:'',creditMin:'',creditMax:'',included:'',result:''});
+    let filters=emptyFilters();
+    const rangeIds=['scoreMin','scoreMax','gpaMin','gpaMax','creditMin','creditMax'];
+
+    function toastPositions(){return new Map(Array.from($('toast').children,element=>[element,element.getBoundingClientRect().top]))}
+    function moveToasts(previous){
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      for(const element of $('toast').children){
+        if(!previous.has(element))continue;
+        toastMotion.get(element)?.cancel();
+        const offset=previous.get(element)-element.getBoundingClientRect().top;
+        if(offset)toastMotion.set(element,element.animate([{transform:`translateY(${offset}px)`},{transform:'translateY(0)'}],{duration:180,easing:'ease-out'}));
+      }
+    }
+    function disposeToast(element){
+      const timers=toastTimers.get(element);
+      if(timers)timers.forEach(clearTimeout);
+      toastTimers.delete(element);toastMotion.get(element)?.cancel();element.remove();
+    }
+    function removeToast(element){
+      if(!element.isConnected)return;
+      const previous=toastPositions();disposeToast(element);moveToasts(previous);
+    }
+    function toast(message, error=false){
+      const stack=$('toast'),previous=toastPositions();
+      if(stack.children.length>=3)disposeToast(stack.firstElementChild);
+      const element=document.createElement('div');element.className=error?'toast error':'toast';element.textContent=message;
+      stack.append(element);moveToasts(previous);
+      if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        toastMotion.set(element,element.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'translateY(0)'}],{duration:180,easing:'ease-out'}));
+      }
+      // Each message owns its deadline; new messages never restart older timers.
+      const fade=setTimeout(()=>element.classList.add('leaving'),TOAST_LIFETIME-TOAST_FADE);
+      const remove=setTimeout(()=>removeToast(element),TOAST_LIFETIME);
+      toastTimers.set(element,[fade,remove]);
+    }
+    function requireTranscript(){
+      if(app.courses.length)return true;
+      toast('还未导入成绩单，请先导入成绩单',true);
+      return false;
+    }
+    const filterControls='#termFilter,#searchInput,#advancedFilter,#selectVisible,#excludeVisible,#selectRequired,#applyAdvanced,#resetAdvanced,#clearFilters,.sort-button';
+    let blockedPointer=null;
+    document.addEventListener('click',event=>{
+      const control=event.target.closest(filterControls);
+      if(!control||app.courses.length)return;
+      if(!(event.detail>0&&blockedPointer?.control===control&&performance.now()-blockedPointer.time<1000))requireTranscript();
+      blockedPointer=null;event.preventDefault();event.stopImmediatePropagation();
+    },true);
+    document.addEventListener('pointerdown',event=>{
+      const control=event.target.closest('#termFilter,#searchInput');
+      if(event.button!==0||!control||app.courses.length)return;
+      requireTranscript();blockedPointer={control,time:performance.now()};
+      event.preventDefault();event.stopImmediatePropagation();
+    },true);
+    $('termFilter').addEventListener('keydown',event=>{
+      if(event.key==='Tab'||event.key==='Escape'||app.courses.length)return;
+      event.preventDefault();event.stopImmediatePropagation();requireTranscript();
+    },true);
+    async function api(path, options={}){
+      const response=await fetch(path,{...options,headers:{'X-Score-Token':app.token,'X-Score-Client':clientId,...(options.headers||{})}});
+      const data=await response.json();
+      if(!response.ok) throw new Error(data.error||'操作失败');
+      return data;
+    }
+    function customTemplate(id){return app.templates.find(item=>item.id===id)}
+    function activeName(){return customTemplate(app.active)?.name||app.builtins.find(item=>item.id===app.active)?.name||'自定义选择'}
+    function visibleIndexes(){
+      const query=$('searchInput').value.trim().toLowerCase();
+
+      const indexes=app.courses.map((_,index)=>index).filter(index=>{
+        const course=app.courses[index];
+        return matchesFilters(course,index,filters)&&matchesSearch(course,query);
+      });
+      if(sortKey){
+        const numeric=['score','gpa','credit'].includes(sortKey);
+        indexes.sort((left,right)=>{
+          const a=app.courses[left], b=app.courses[right];
+          if(sortKey==='score'&&a.score_valid!==b.score_valid)return a.score_valid?-1:1;
+          if(sortKey==='gpa'&&a.gpa_valid!==b.gpa_valid)return a.gpa_valid?-1:1;
+          const comparison=numeric?Number(a[sortKey])-Number(b[sortKey]):collator.compare(String(a[sortKey]||''),String(b[sortKey]||''));
+          return (sortDirection==='desc'?-comparison:comparison)||left-right;
+        });
+      }
+      return indexes;
+    }
+    function matchesSearch(course,query=$('searchInput').value.trim().toLowerCase()){
+      return !query||[course.name,course.nature,course.term].some(value=>String(value).toLowerCase().includes(query));
+    }
+    function matchesFilters(course,index,conditions){
+      if(conditions.terms.length&&!conditions.terms.includes(course.term))return false;
+      if(conditions.natures.length&&!conditions.natures.includes(course.nature))return false;
+      if(conditions.included==='included'&&!app.selected[index])return false;
+      if(conditions.included==='excluded'&&app.selected[index])return false;
+      if(conditions.result==='invalid'&&course.score_valid)return false;
+      if(conditions.result==='pass'&&(!course.score_valid||course.score<60))return false;
+      if(conditions.result==='fail'&&(!course.score_valid||course.score>=60))return false;
+      for(const field of ['score','gpa','credit']){
+        const min=conditions[field+'Min'],max=conditions[field+'Max'];
+        if(min===''&&max==='')continue;
+        if(field==='score'&&!course.score_valid||field==='gpa'&&course.gpa_valid===false)return false;
+        if(min!==''&&Number(course[field])<Number(min)||max!==''&&Number(course[field])>Number(max))return false;
+      }
+      return true;
+    }
+    function renderTermFilter(){
+      const select=$('termFilter');
+      const terms=[...new Set(app.courses.map(course=>course.term))].sort((a,b)=>collator.compare(b,a));
+      select.replaceChildren(new Option('全部学期',''),...terms.map(term=>new Option(term||'未标注学期',term||'__unmarked')));
+      if(filters.terms.length>1){select.add(new Option(`已选 ${filters.terms.length} 个学期`,'__multiple'));select.value='__multiple'}
+      else select.value=filters.terms.length?(filters.terms[0]||'__unmarked'):'';
+    }
+    function optionChips(container,values,selected,emptyLabel){
+      container.replaceChildren();
+      if(!values.length){const hint=document.createElement('span');hint.className='minor';hint.textContent='导入成绩单后显示选项';container.append(hint);return}
+      for(const value of values){
+        const label=document.createElement('label');label.className='filter-chip';
+        const input=document.createElement('input');input.type='checkbox';input.value=value;input.checked=selected.includes(value);
+        const text=document.createElement('span');text.textContent=value||emptyLabel;label.append(input,text);container.append(label);
+      }
+    }
+    function fillFilterPanel(conditions=filters){
+      optionChips($('advancedTerms'),[...new Set(app.courses.map(course=>course.term))].sort((a,b)=>collator.compare(a,b)),conditions.terms,'未标注学期');
+      optionChips($('advancedNatures'),[...new Set(app.courses.map(course=>course.nature))].sort(collator.compare),conditions.natures,'未标注性质');
+      rangeIds.forEach(id=>$(id).value=conditions[id]);
+      $('includedFilter').value=conditions.included;$('resultFilter').value=conditions.result;
+      previewFilters();
+    }
+    function readFilterPanel(){
+      const conditions=emptyFilters();
+      conditions.terms=Array.from($('advancedTerms').querySelectorAll('input:checked'),input=>input.value);
+      conditions.natures=Array.from($('advancedNatures').querySelectorAll('input:checked'),input=>input.value);
+      rangeIds.forEach(id=>conditions[id]=$(id).value.trim());
+      conditions.included=$('includedFilter').value;conditions.result=$('resultFilter').value;
+      return conditions;
+    }
+    function filterValidation(conditions){
+      for(const [field,label] of [['score','成绩'],['gpa','绩点'],['credit','学分']]){
+        if(conditions[field+'Min']!==''&&conditions[field+'Max']!==''&&Number(conditions[field+'Min'])>Number(conditions[field+'Max']))return `${label}最低值不能大于最高值`;
+      }
+      return '';
+    }
+    function previewFilters(){
+      const draft=readFilterPanel(),error=filterValidation(draft);
+      $('filterError').textContent=error;$('filterError').hidden=!error;$('applyAdvanced').disabled=Boolean(error);
+      const count=app.courses.filter((course,index)=>matchesFilters(course,index,draft)&&matchesSearch(course)).length;
+      $('filterPreview').textContent=error?'请调整筛选范围':`预计显示 ${count} / ${app.courses.length} 门课程`;
+    }
+    function showAdvanced(open){
+      $('advancedPanel').hidden=!open;$('advancedFilter').setAttribute('aria-expanded',String(open));
+      if(open)fillFilterPanel();
+      else $('advancedFilter').focus();
+    }
+    function renderFilterSummary(){
+      const parts=[];
+      if(filters.terms.length)parts.push('学期：'+filters.terms.map(value=>value||'未标注').join('、'));
+      if(filters.natures.length)parts.push('性质：'+filters.natures.join('、'));
+      for(const [field,label] of [['score','成绩'],['gpa','绩点'],['credit','学分']]){
+        if(filters[field+'Min']!==''||filters[field+'Max']!=='')parts.push(`${label}：${filters[field+'Min']||'不限'} 至 ${filters[field+'Max']||'不限'}`);
+      }
+      if(filters.included)parts.push(filters.included==='included'?'已计入':'已排除');
+      if(filters.result)parts.push({pass:'及格',fail:'不及格',invalid:'成绩待核对'}[filters.result]);
+      $('filterCount').textContent=parts.length;$('filterCount').hidden=!parts.length;
+      $('advancedFilter').classList.toggle('active',Boolean(parts.length));
+      $('filterSummary').hidden=!parts.length;$('filterSummaryText').textContent=parts.join(' · ');
+    }
+    function renderSortButtons(){
+      document.querySelectorAll('.sort-button').forEach(button=>{
+        const direction=button.dataset.sort===sortKey?sortDirection:null;
+        button.dataset.order=direction||'default';
+        button.parentElement.setAttribute('aria-sort',direction==='asc'?'ascending':direction==='desc'?'descending':'none');
+        button.setAttribute('aria-label',`${button.dataset.sort==='score'?'总成绩':button.textContent}排序，当前${direction==='desc'?'从高到低':direction==='asc'?'从低到高':'默认顺序'}，点击切换`);
+      });
+    }
+    function renderTemplates(){
+      const select=$('templateSelect'); select.replaceChildren();
+      const builtinGroup=document.createElement('optgroup'); builtinGroup.label='内置模板';
+      for(const item of app.builtins){const option=document.createElement('option');option.value=item.id;option.textContent=item.name;builtinGroup.append(option)}
+      select.append(builtinGroup);
+      if(app.templates.length){const group=document.createElement('optgroup');group.label='自定义模板';for(const item of app.templates){const option=document.createElement('option');option.value=item.id;option.textContent=item.name;group.append(option)}select.append(group)}
+      select.value=app.active;
+      $('deleteButton').disabled=!customTemplate(app.active);
+    }
+    function applyTemplate(id){
+      const template=customTemplate(id);
+      const base=template?.base||id;
+      if(!app.builtins.some(item=>item.id===base)) return;
+      const included=new Set(template?.include||[]), excluded=new Set(template?.exclude||[]);
+      app.selected=app.courses.map(course=>course.credit>0 && (excluded.has(course.key)?false:included.has(course.key)?true:Boolean(course.builtin[base])));
+      app.active=id; app.base=base; app.dirty=false;
+      renderTemplates(); render();
+    }
+    function markChanged(){app.dirty=true;renderSummary()}
+    function renderSummary(){
+      let count=0, credits=0, scoreSum=0, gpaSum=0, invalid=0, missingGpa=0;
+      app.courses.forEach((course,index)=>{if(app.selected[index]&&course.credit>0){count++;credits+=course.credit;scoreSum+=course.score*course.credit;gpaSum+=course.gpa*course.credit;if(!course.score_valid)invalid++;if(course.gpa_valid===false)missingGpa++}});
+      $('weightedScore').textContent=(credits?scoreSum/credits:0).toFixed(5);
+      $('weightedGpa').textContent=missingGpa?'—':(credits?gpaSum/credits:0).toFixed(4);
+      $('totalCredits').textContent=credits.toFixed(1);
+      $('selectedCount').textContent=`${count} / ${app.courses.length}`;
+      const builtin=app.builtins.find(item=>item.id===app.base);
+      const intro=customTemplate(app.active)?`基于“${builtin?.name||''}”保存的课程选择`:(builtin?.description||'');
+      const method=$('methodLabel');method.replaceChildren();
+      const name=document.createElement('strong');name.textContent=activeName()+'：';method.append(name);
+      if(app.active==='postgraduate'){
+        intro.split(/(限选)/).forEach(part=>{
+          if(part==='限选'){const excluded=document.createElement('span');excluded.className='excluded-nature';excluded.textContent=part;method.append(excluded)}
+          else method.append(document.createTextNode(part));
+        });
+      }else method.append(document.createTextNode(intro));
+      if(app.base==='postgraduate'){const hint=document.createElement('span');hint.className='policy-hint';hint.textContent=' · 不同学院保研政策不同，请按本学院要求调整计入课程，并点击“另存为自定义模板”保存。';method.append(hint)}
+      if(app.dirty){const dirty=document.createElement('span');dirty.className='dirty';dirty.textContent=' · 当前勾选尚未保存';method.append(dirty)}
+      if(invalid){const warning=document.createElement('span');warning.className='dirty';warning.textContent=` · ${invalid} 门已计入课程的成绩无效，按 0 分计算`;method.append(warning)}
+      if(missingGpa){const warning=document.createElement('span');warning.className='dirty';warning.textContent=` · ${missingGpa} 门已计入课程未提供绩点，暂不显示加权绩点`;method.append(warning)}
+    }
+
+    function cell(text,className=''){
+      const td=document.createElement('td');if(className)td.className=className;td.textContent=text;return td;
+    }
+    function renderRows(){
+      renderSortButtons();renderFilterSummary();
+      const indexes=visibleIndexes(), fragment=document.createDocumentFragment();
+      for(const index of indexes){
+        const course=app.courses[index], checked=Boolean(app.selected[index]);
+        const row=document.createElement('tr');if(!checked)row.classList.add('off');
+        const failing=course.grade==='不及格'||course.grade==='F'||(course.score_valid&&Number(course.score)<60);
+        if(failing)row.classList.add('fail-row');
+        const toggleCell=document.createElement('td');
+        const button=document.createElement('button');button.className='switch';button.type='button';button.setAttribute('role','switch');button.setAttribute('aria-checked',String(checked));button.setAttribute('aria-label',`${checked?'排除':'计入'} ${course.name}`);button.disabled=course.credit<=0;
+        const track=document.createElement('span');track.className='track';const knob=document.createElement('span');knob.className='knob';track.append(knob);
+        const label=document.createElement('span');label.textContent=checked?'计入':'排除';button.append(track,label);
+        button.addEventListener('click',()=>{app.selected[index]=!app.selected[index];markChanged();renderRows()});toggleCell.append(button);row.append(toggleCell);
+        const nameCell=document.createElement('td');const name=document.createElement('div');name.className='course-name';name.textContent=course.name;nameCell.append(name);row.append(nameCell);
+        row.append(cell(course.nature||'—'));
+        const gradeCell=document.createElement('td');gradeCell.className='num';gradeCell.textContent=course.grade||'—';
+        if(Object.hasOwn(gradeValues,course.grade)){const note=document.createElement('span');note.className='grade-note';note.textContent=`按${gradeValues[course.grade]}`;gradeCell.append(note)}
+        if(!course.score_valid)gradeCell.classList.add('bad');
+        if(failing)gradeCell.classList.add('grade-fail');
+        row.append(gradeCell);
+        row.append(cell(course.gpa_valid===false?'—':Number(course.gpa).toFixed(2),'num'));
+        row.append(cell(Number(course.credit).toFixed(1),'num'));
+        row.append(cell(course.term||'—'));
+        fragment.append(row);
+      }
+      $('courseBody').replaceChildren(fragment);
+      $('visibleCount').textContent=`显示 ${indexes.length}/${app.courses.length} 门课程`;
+      $('emptyState').hidden=indexes.length>0;
+    }
+    function render(){
+      $('fileLabel').textContent=app.filename?`当前成绩单：${app.filename} · 共 ${app.courses.length} 门课程`:'尚未导入成绩单。支持 Excel 和 CSV；可将文件拖入窗口或拖到 exe 上打开。';
+      $('importNotes').textContent=(app.import_notes||[]).join(' · ');
+      renderSummary();renderRows();
+    }
+    function ensureNoUnsavedChanges(){return !app.dirty||confirm('当前勾选尚未保存。继续后会放弃这些调整，确定吗？')}
+
+    $('templateSelect').addEventListener('change',event=>{const next=event.target.value;if(!ensureNoUnsavedChanges()){event.target.value=app.active;return}applyTemplate(next)});
+    $('searchInput').addEventListener('input',()=>{if(!requireTranscript()){$('searchInput').value='';return}renderRows()});
+    $('termFilter').addEventListener('change',event=>{
+      if(!requireTranscript()){event.target.value='';return}
+      if(event.target.value==='__multiple')return;
+      filters.terms=event.target.value?[event.target.value==='__unmarked'?'':event.target.value]:[];
+      if(!$('advancedPanel').hidden)fillFilterPanel();renderRows();
+    });
+    $('advancedFilter').addEventListener('click',()=>showAdvanced($('advancedPanel').hidden));
+    $('closeAdvanced').addEventListener('click',()=>showAdvanced(false));
+    $('advancedPanel').addEventListener('input',previewFilters);
+    $('advancedPanel').addEventListener('change',previewFilters);
+    $('resetAdvanced').addEventListener('click',()=>fillFilterPanel(emptyFilters()));
+    $('applyAdvanced').addEventListener('click',()=>{
+      const draft=readFilterPanel();if(filterValidation(draft)){previewFilters();return}
+      filters=draft;renderTermFilter();renderRows();showAdvanced(false);
+    });
+    $('clearFilters').addEventListener('click',()=>{filters=emptyFilters();renderTermFilter();if(!$('advancedPanel').hidden)fillFilterPanel();renderRows()});
+    document.querySelectorAll('.sort-button').forEach(button=>button.addEventListener('click',()=>{
+      const key=button.dataset.sort;
+      if(sortKey!==key){sortKey=key;sortDirection='desc'}
+      else if(sortDirection==='desc')sortDirection='asc';
+      else{sortKey=null;sortDirection=null}
+      renderRows();
+    }));
+    $('importButton').addEventListener('click',()=>$('fileInput').click());
+    async function importFile(file){
+      if(!file)return;
+      if(!/\.(xlsx|xls|csv)$/i.test(file.name)){toast('请选择 .xlsx、.xls 或 .csv 成绩单',true);return}
+      if(!ensureNoUnsavedChanges())return;
+      try{const data=await api('/api/import',{method:'POST',headers:{'X-Filename':encodeURIComponent(file.name)},body:file});app.courses=data.courses;app.filename=data.filename;app.import_notes=data.import_notes||[];sortKey=null;sortDirection=null;filters=emptyFilters();$('advancedPanel').hidden=true;$('advancedFilter').setAttribute('aria-expanded','false');renderTermFilter();applyTemplate(app.active);toast(`已导入 ${app.courses.length} 门课程`)}
+      catch(error){toast(error.message,true)}
+    }
+    $('fileInput').addEventListener('change',async event=>{try{await importFile(event.target.files[0])}finally{event.target.value=''}});
+    let dragDepth=0;
+    function isFileDrag(event){return Array.from(event.dataTransfer?.types||[]).includes('Files')}
+    function hideDropOverlay(){dragDepth=0;$('dropOverlay').hidden=true}
+    document.addEventListener('dragenter',event=>{
+      if(!isFileDrag(event))return;
+      event.preventDefault();dragDepth++;
+      $('dropTitle').textContent=app.filename?'拖入此处更换成绩单':'拖入此处导入成绩单';
+      $('dropOverlay').hidden=false;
+    },true);
+    document.addEventListener('dragover',event=>{
+      if(!isFileDrag(event))return;
+      event.preventDefault();event.dataTransfer.dropEffect='copy';
+    },true);
+    document.addEventListener('dragleave',event=>{if(isFileDrag(event)&&--dragDepth<=0)hideDropOverlay()},true);
+    document.addEventListener('drop',event=>{
+      if(!isFileDrag(event))return;
+      event.preventDefault();event.stopPropagation();hideDropOverlay();
+      const files=Array.from(event.dataTransfer.files);
+      if(files.length!==1){toast('请一次拖入一份成绩单',true);return}
+      importFile(files[0]);
+    },true);
+    window.addEventListener('blur',hideDropOverlay);
+    function setVisible(value){for(const index of visibleIndexes()){if(app.courses[index].credit>0)app.selected[index]=value}markChanged();renderRows()}
+    $('selectVisible').addEventListener('click',()=>setVisible(true));
+    $('excludeVisible').addEventListener('click',()=>setVisible(false));
+    $('selectRequired').addEventListener('click',()=>{
+      app.courses.forEach((course,index)=>{if((course.required??course.nature==='必修')&&course.credit>0)app.selected[index]=true});
+      markChanged();renderRows();
+    });
+    $('saveButton').addEventListener('click',()=>{
+      if(!app.courses.length){toast('请先导入成绩单',true);return}
+      $('templateName').value='';$('modalDescription').textContent=`将当前勾选保存为新模板，基础规则为“${app.builtins.find(item=>item.id===app.base)?.name||''}”。`;
+      $('saveModal').hidden=false;$('templateName').focus();
+    });
+    function closeModal(){$('saveModal').hidden=true}
+    $('cancelSave').addEventListener('click',closeModal);
+    $('saveModal').addEventListener('click',event=>{if(event.target===$('saveModal'))closeModal()});
+    $('templateName').addEventListener('keydown',event=>{if(event.key==='Enter')$('confirmSave').click();if(event.key==='Escape')closeModal()});
+    $('confirmSave').addEventListener('click',async()=>{
+      const name=$('templateName').value.trim();if(!name){toast('请输入模板名称',true);return}
+      const include=[],exclude=[];
+      app.courses.forEach((course,index)=>{const base=Boolean(course.builtin[app.base]);if(app.selected[index]&&!base)include.push(course.key);if(!app.selected[index]&&base)exclude.push(course.key)});
+      try{const data=await api('/api/templates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,base:app.base,include,exclude})});app.templates=data.templates;closeModal();applyTemplate(data.template.id);toast('模板已保存，下次打开仍可使用')}
+      catch(error){toast(error.message,true)}
+    });
+    $('deleteButton').addEventListener('click',async()=>{
+      const template=customTemplate(app.active);if(!template)return;
+      if(!confirm(`删除自定义模板“${template.name}”？`))return;
+      try{const data=await api(`/api/templates/${encodeURIComponent(template.id)}`,{method:'DELETE'});app.templates=data.templates;applyTemplate(template.base);toast('模板已删除')}
+      catch(error){toast(error.message,true)}
+    });
+    let policySaving=false;
+    async function acknowledgePolicy(){
+      if(policySaving)return;
+      policySaving=true;$('acknowledgePolicy').disabled=true;$('closePolicy').disabled=true;
+      try{
+        await api('/api/policy-notice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({acknowledged:true})});
+        app.policy_notice_seen=true;$('policyModal').hidden=true;
+        (app.courses.length?$('saveButton'):$('importButton')).focus();
+      }catch(error){toast(`无法保存提醒状态：${error.message}`,true)}
+      finally{policySaving=false;$('acknowledgePolicy').disabled=false;$('closePolicy').disabled=false}
+    }
+    $('acknowledgePolicy').addEventListener('click',acknowledgePolicy);
+    $('closePolicy').addEventListener('click',acknowledgePolicy);
+    document.addEventListener('keydown',event=>{
+      if($('policyModal').hidden)return;
+      if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();acknowledgePolicy()}
+      if(event.key==='Tab'){
+        const buttons=Array.from($('policyModal').querySelectorAll('button:not(:disabled)'));
+        if(!buttons.length){event.preventDefault();return}
+        const next=buttons.indexOf(document.activeElement)+(event.shiftKey?-1:1);
+        event.preventDefault();buttons[(next+buttons.length)%buttons.length].focus();
+      }
+    },true);
+    function closeHelp(){$('helpModal').hidden=true;$('helpButton').focus()}
+    $('helpButton').addEventListener('click',()=>{$('helpModal').hidden=false;$('closeHelp').focus()});
+    $('closeHelp').addEventListener('click',closeHelp);
+    $('helpModal').addEventListener('click',event=>{if(event.target===$('helpModal'))closeHelp()});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(!$('helpModal').hidden)closeHelp();else if(!$('advancedPanel').hidden)showAdvanced(false)}});
+    $('exitButton').addEventListener('click',async()=>{
+      if(window.pywebview?.api?.close){
+        try{await window.pywebview.api.close();return}catch(error){toast(`无法关闭窗口：${error.message}`,true);return}
+      }
+      try{await api('/api/shutdown',{method:'POST',body:'exit'})}
+      finally{document.body.innerHTML='<main style="padding:40px;font-family:sans-serif">计算器已退出，可以关闭此页面。</main>'}
+    });
+    setInterval(()=>{if(app.token)api('/api/heartbeat',{method:'POST',body:'ping'}).catch(()=>{})},5000);
+    window.addEventListener('pagehide',()=>{
+      if(!app.token)return;
+      fetch('/api/page-close',{method:'POST',headers:{'X-Score-Token':app.token,'X-Score-Client':clientId},body:'closed',keepalive:true}).catch(()=>{});
+    });
+    (async()=>{try{const data=await api('/api/state');Object.assign(app,data);renderTermFilter();applyTemplate('postgraduate');if(!data.policy_notice_seen){$('policyModal').hidden=false;$('acknowledgePolicy').focus()}if(data.error)toast(data.error,true)}catch(error){toast(`无法连接计算器：${error.message}`,true)}})();
+  </script>
+</body>
+</html>

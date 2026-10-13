@@ -1,0 +1,19 @@
+成绩与绩点计算器 / Score Calculator
+Copyright (c) 2026 Li Jiaye (Aohpup)
+
+项目原创代码及文档采用根目录 LICENSE 中的 MIT License。
+
+第三方图片
+----------
+jlu_transcript_explanation.jpg 为吉林大学《本科学生成绩单相关说明》图片，
+由项目维护者提供的公开说明图片整理而来，用于成绩单说明展示。
+图片中的校名、校徽、印章和原有说明内容的权利归其原权利人所有。
+本项目不将该图片作为原创作品按 MIT 重新授权，不代表吉林大学官方发布或背书。
+培养方案及成绩政策以学院、学校官方发布为准。
+
+第三方软件
+----------
+Python、pandas、NumPy、openpyxl、xlrd、pywebview、pythonnet 等依赖
+保留各自的版权和许可；随 Windows 程序分发的相关声明见 THIRD_PARTY_NOTICES.md。
+WebView2 Runtime 由 Microsoft 提供，使用者应遵守其适用条款。
+本项目不将第三方软件重新授权为 MIT。
