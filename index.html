@@ -53,6 +53,7 @@
     .toast-stack{position:fixed;right:24px;bottom:24px;width:min(420px,calc(100vw - 48px));display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:60;pointer-events:none}.toast{position:relative;background:#28384b;color:#fff;padding:11px 16px;border-radius:9px;box-shadow:0 8px 24px #0002;max-width:100%;overflow-wrap:anywhere;opacity:1;transition:opacity .35s ease}.toast.error{background:#ab3147}.toast.leaving{opacity:0}@media(prefers-reduced-motion:reduce){.toast{transition:none}}
     .modal-backdrop{position:fixed;inset:0;background:#1e263c76;display:grid;place-items:center;z-index:20}.modal{background:#fff;border-radius:14px;width:min(420px,calc(100vw - 32px));padding:24px;box-shadow:0 18px 50px #0003}.modal h2{font-size:19px;margin:0 0 10px}.modal p{font-size:13px;color:#737b88;line-height:1.5;margin:0 0 17px}.modal input{width:100%;height:42px;border:1px solid #d9dce2;border-radius:8px;padding:0 11px;outline:none}.modal input:focus{border-color:#b8384d}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
     .help-backdrop{position:fixed;inset:0;background:#1e263ca6;display:grid;place-items:center;z-index:30;padding:20px}.help-dialog{background:#fff;border-radius:14px;width:min(1080px,100%);max-height:100%;display:flex;flex-direction:column;box-shadow:0 22px 60px #0004;overflow:hidden}.help-header{display:flex;align-items:center;gap:16px;padding:18px 22px;border-bottom:1px solid #e9e5e9}.help-header h2{font-size:20px;margin:0}.help-close{margin-left:auto;border:0;background:transparent;color:#667181;font-size:28px;line-height:1;width:32px;height:32px;border-radius:7px}.help-close:hover{background:#f6edef;color:#ac344a}.help-content{display:grid;grid-template-columns:minmax(280px,46%) minmax(300px,1fr);gap:26px;padding:22px;overflow:auto}.help-figure{margin:0}.help-figure img{display:block;width:100%;height:auto;border:1px solid #dae1e8;border-radius:8px;background:#c6e9f9}.help-figure figcaption{font-size:12px;color:#8b929e;margin-top:8px}.help-copy h3{font-size:16px;margin:3px 0 11px}.help-copy p,.help-copy li{font-size:14px;line-height:1.75;color:#4d5868}.help-copy ul{padding-left:21px;margin:8px 0 18px}.help-copy .notice{background:#f7f4f6;border-left:3px solid #b4374c;border-radius:5px;padding:12px 14px}.help-copy a{color:#a52e45;font-weight:600;text-decoration:underline;text-underline-offset:2px}.help-copy .small{font-size:12px;color:#9299a4}
+    .friend-links{margin-top:20px;padding-top:18px;border-top:1px solid #e9e3e8}.college-sites{display:grid;gap:8px;margin:12px 0 15px}.help-copy a.college-link{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid #e6dce2;border-radius:9px;background:#fffafb;text-decoration:none;transition:background .15s,border-color .15s}.help-copy a.college-link:hover{background:#fff0f3;border-color:#d293a2}.college-link strong{display:block;color:#5c3b47;font-size:14px}.college-link small{display:block;color:#94919b;font-size:11px;font-weight:400;margin-top:3px}.college-link .external-arrow{margin-left:auto;color:#b4374c;font-size:19px}.search-keywords{display:grid;grid-template-columns:minmax(48px,1fr) minmax(0,6.5fr) minmax(48px,1fr);gap:8px;width:100%;margin:9px 0 12px}.keyword-button{min-width:0;padding:8px 10px;background:#f8eff2;border:1px solid #efdae2;border-radius:7px;font-size:14px;color:#a03a51;line-height:1.6;text-align:center;white-space:nowrap;transition:background .15s,border-color .15s}.keyword-button:hover{background:#f3e0e7;border-color:#d396a8}.keyword-button:active{background:#edccd7}.keyword-button:focus-visible{outline:2px solid #b4374c;outline-offset:2px}.policy-help-note{padding:12px 14px;border:1px solid #ead4dc;background:#fff8fa;border-radius:9px;margin-bottom:14px}.policy-help-note strong{display:block;color:#a4374f;font-size:14px;margin-bottom:6px}.policy-modal .policy-help-note p{margin:0;color:#756775;font-size:13px;line-height:1.75}
     .drop-overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:28px;background:#f5e8edaa;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);pointer-events:none}
     .drop-card{width:min(560px,100%);min-height:280px;border:3px dashed #b63d55;border-radius:24px;background:#ffffffd9;box-shadow:0 24px 70px #70334938;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;color:#9f3047}
     .drop-icon{width:76px;height:76px;border-radius:24px;background:#f9e5ea;display:grid;place-items:center;font-size:38px;line-height:1;margin-bottom:19px}.drop-title{font-size:27px;font-weight:750;color:#7f2538}.drop-hint{font-size:14px;color:#76636a;margin:10px 0 0}
@@ -136,7 +137,8 @@
       <div class="policy-heading"><h2 id="policyTitle">请按本学院政策设置计算模板</h2><button class="help-close" id="closePolicy" type="button" aria-label="确认并关闭学院政策提醒">×</button></div>
       <p class="policy-lead" id="policyDescription">不同学院的保研政策和计入课程范围可能不同。内置保研模板仅供参考，请以本学院当年发布的政策为准。</p>
       <ol class="policy-steps"><li>导入成绩单，核对本学院的课程计入要求。</li><li>通过课程左侧开关，调整需要计入或排除的课程。</li><li>点击顶部“另存为自定义模板”，保存适合本学院的计算方案。</li><li>下次使用时，在“计算模板”中选择已保存的模板。</li></ol>
-      <p class="policy-small">确认后不再自动弹出。可通过右上角“？”帮助按钮再次查看这段指引。</p>
+      <div class="policy-help-note"><strong>点击“？”帮助，查看学院官网和政策查询指引</strong><p>软件右上角的“？”按钮可打开帮助界面。在“友情链接”中进入本学院官网，搜索“免试”“推免”等关键词查找方案，再按学院规则保存自定义模板。</p></div>
+      <p class="policy-small">确认后不再自动弹出。使用指引、学院官网链接和查询关键词可随时在帮助界面查看。</p>
       <div class="modal-actions"><button class="button primary" id="acknowledgePolicy" type="button">我已了解</button></div>
     </section>
   </div>
@@ -169,6 +171,20 @@
             <h3>培养方案查询</h3>
             <p>2022/2026 版培养方案请到对应学院官网，或通过<a href="https://cas.jlu.edu.cn/" target="_blank" rel="noopener noreferrer">吉林大学智慧校园入口</a>登录后进入教务系统查询。</p>
           </div>
+          <section class="friend-links" aria-labelledby="friendLinksTitle">
+            <h3 id="friendLinksTitle">友情链接 · 学院官网</h3>
+            <p>不同学院的统计口径可能不同，请到本学院官网查找当年适用的推免方案，再调整课程计入范围。</p>
+            <div class="college-sites">
+              <a class="college-link" href="https://csw.jlu.edu.cn/index.htm" target="_blank" rel="noopener noreferrer"><span><strong>吉林大学软件学院</strong><small>csw.jlu.edu.cn</small></span><span class="external-arrow" aria-hidden="true">↗</span></a>
+              <a class="college-link" href="https://ccst.jlu.edu.cn/index.htm" target="_blank" rel="noopener noreferrer"><span><strong>吉林大学计算机科学与技术学院</strong><small>ccst.jlu.edu.cn</small></span><span class="external-arrow" aria-hidden="true">↗</span></a>
+              <a class="college-link" href="https://sai.jlu.edu.cn/" target="_blank" rel="noopener noreferrer"><span><strong>吉林大学人工智能学院</strong><small>sai.jlu.edu.cn</small></span><span class="external-arrow" aria-hidden="true">↗</span></a>
+              <a class="college-link" href="https://sg.jlu.edu.cn/" target="_blank" rel="noopener noreferrer"><span><strong>吉林大学商学与管理学院</strong><small>sg.jlu.edu.cn</small></span><span class="external-arrow" aria-hidden="true">↗</span></a>
+            </div>
+            <h3>如何查找本学院方案</h3>
+            <p>打开官网后，使用站内搜索查找以下关键词，也可查看“本科生教育”“本科生教学”或“教办通知”等栏目：</p>
+            <div class="search-keywords" aria-label="点击复制查询关键词"><button type="button" class="keyword-button" title="点击复制关键词">免试</button><button type="button" class="keyword-button" title="点击复制关键词">推荐优秀应届本科毕业生免试攻读研究生</button><button type="button" class="keyword-button" title="点击复制关键词">推免</button></div>
+            <p>寻找对应届别的推荐工作实施细则、学业成绩统计办法或推免方案。请核对文件年份、适用专业和计入课程范围，按官方方案调整后点击“另存为自定义模板”保存。</p>
+          </section>
           <p class="small">本图用于解读成绩单；具体课程要求与培养方案以学院或教务系统发布的版本为准。</p>
         </div>
       </div>
@@ -546,6 +562,23 @@
         event.preventDefault();buttons[(next+buttons.length)%buttons.length].focus();
       }
     },true);
+    function fallbackCopyKeyword(text){
+      const previous=document.activeElement,field=document.createElement('textarea');
+      field.value=text;field.readOnly=true;field.style.position='fixed';field.style.left='-9999px';field.setAttribute('aria-hidden','true');
+      document.body.append(field);
+      try{field.focus();field.select();field.setSelectionRange(0,text.length);return document.execCommand('copy')}
+      finally{field.remove();previous?.focus({preventScroll:true})}
+    }
+    async function copyKeyword(text){
+      let copied=false;
+      try{
+        if(navigator.clipboard?.writeText){try{await navigator.clipboard.writeText(text);copied=true}catch(error){}}
+        if(!copied)copied=fallbackCopyKeyword(text);
+        if(!copied)throw new Error('Clipboard unavailable');
+        toast('已复制到剪贴板');
+      }catch(error){toast('复制失败，请手动选择并复制关键词',true)}
+    }
+    document.querySelectorAll('.keyword-button').forEach(button=>button.addEventListener('click',()=>copyKeyword(button.textContent.trim())));
     function closeHelp(){$('helpModal').hidden=true;$('helpButton').focus()}
     $('helpButton').addEventListener('click',()=>{$('helpModal').hidden=false;$('closeHelp').focus()});
     $('closeHelp').addEventListener('click',closeHelp);

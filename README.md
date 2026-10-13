@@ -4,9 +4,13 @@
 [![Tests](https://github.com/Aohpup/score-calculator/actions/workflows/tests.yml/badge.svg)](https://github.com/Aohpup/score-calculator/actions/workflows/tests.yml)
 [![Latest release](https://img.shields.io/github/v/release/Aohpup/score-calculator)](https://github.com/Aohpup/score-calculator/releases/latest)
 
+**直接下载：** [Windows x64 压缩包](https://github.com/Aohpup/score-calculator/releases/latest/download/score-calculator-windows-x64.zip) · [Windows x64 单文件 EXE](https://github.com/Aohpup/score-calculator/releases/latest/download/score-calculator-windows-x64.exe)
+
 一个在本机运行的成绩计算工具。导入 Excel 或 CSV 成绩单，逐门选择计入课程，即时查看学分加权成绩、加权绩点和学分，支持高级筛选与可重复使用的自定义模板。
 
-**不同学院保研政策不同。请以本学院当年发布的政策为准，调整课程计入范围后，点击“另存为自定义模板”保存自己的方案。** 内置模板依据吉林大学相关使用场景设计；其他学院或学校请先核对规则。本项目为个人开源工具，不是吉林大学官方软件。
+**不同学院保研政策不同。请以本学院当年发布的政策为准，调整课程计入范围后，点击“另存为自定义模板”保存自己的方案。** 内置模板依据吉林大学相关使用场景设计，不同学院的统计口径略有不同，在选用模板时请先在官网上核对 学院下发的规则。本项目为个人开源工具，不是吉林大学官方软件。
+
+**注意事项：** 本软件主要针对吉林大学成绩单格式及相关计算场景开发。非吉林大学的成绩单不保证能够正常导入和计算，内置模板及等级成绩换算也可能不适用。请核对导入结果，并按本校、本学院政策调整课程计入范围，另存为自定义模板。
 
 ![计算器界面，使用虚构示例数据](docs/screenshot.png)
 
